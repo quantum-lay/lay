@@ -5,8 +5,11 @@ struct EchoDriver {
 }
 
 impl Laysur for EchoDriver {
+    type Receive = ();
     fn initialize(&mut self) {
         println!("initialize()");
+    }
+    fn receive(&mut self) -> () {
     }
 }
 
@@ -45,8 +48,11 @@ impl<T> TransparentLayer<T> {
 }
 
 impl<T: Laysur> Laysur for TransparentLayer<T> {
+    type Receive = ();
     fn initialize(&mut self) {
         self.base.initialize();
+    }
+    fn receive(&mut self) -> () {
     }
 }
 
