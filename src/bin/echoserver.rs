@@ -1,36 +1,36 @@
 use laysur::Laysur;
 use laysur::gates::{XGate, YGate, ZGate, CXGate};
 
-struct PrintQasmDriver {
+struct EchoDriver {
 }
 
-impl Laysur for PrintQasmDriver {
+impl Laysur for EchoDriver {
     fn initialize(&mut self) {
-        println!("OPENQASM 2.0;");
+        println!("initialize()");
     }
 }
 
-impl XGate for PrintQasmDriver {
+impl XGate for EchoDriver {
     fn x(&mut self, q: u32) {
-        println!("x [{}];", q);
+        println!("x({})", q);
     }
 }
 
-impl YGate for PrintQasmDriver {
+impl YGate for EchoDriver {
     fn y(&mut self, q: u32) {
-        println!("y [{}];", q);
+        println!("y({})", q);
     }
 }
 
-impl ZGate for PrintQasmDriver {
+impl ZGate for EchoDriver {
     fn z(&mut self, q: u32) {
-        println!("z [{}];", q);
+        println!("z({})", q);
     }
 }
 
-impl CXGate for PrintQasmDriver {
+impl CXGate for EchoDriver {
     fn cx(&mut self, c: u32, t: u32) {
-        println!("cx [{}, {}];", c, t);
+        println!("cx({}, {})", c, t);
     }
 }
 
@@ -69,7 +69,7 @@ impl<T: ZGate> ZGate for TransparentLayer<T> {
 }
 
 fn main() {
-    let mut cli = TransparentLayer::new(PrintQasmDriver{});
+    let mut cli = TransparentLayer::new(TransparentLayer::new(EchoDriver{}));
     cli.initialize();
     cli.x(0);
     cli.y(0);
