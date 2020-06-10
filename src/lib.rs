@@ -1,6 +1,7 @@
 pub type Qubit = u32;
 
 pub mod gates;
+
 // 何をもらってくるのがいいか?
 pub trait Layer {
     type Receive; // 何らかのトレイトにしたい

@@ -1,5 +1,5 @@
 use lay::Layer;
-use lay::gates::{PauliGate, CXGate};
+use lay::gates::{CliffordGate};
 
 struct EchoDriver {
 }
@@ -13,7 +13,7 @@ impl Layer for EchoDriver {
     }
 }
 
-impl PauliGate for EchoDriver {
+impl CliffordGate for EchoDriver {
     fn x(&mut self, q: u32) {
         println!("x({})", q);
     }
@@ -23,9 +23,15 @@ impl PauliGate for EchoDriver {
     fn z(&mut self, q: u32) {
         println!("z({})", q);
     }
-}
-
-impl CXGate for EchoDriver {
+    fn h(&mut self, q: u32) {
+        println!("h({})", q);
+    }
+    fn s(&mut self, q: u32) {
+        println!("s({})", q);
+    }
+    fn sdg(&mut self, q: u32) {
+        println!("sdg({})", q);
+    }
     fn cx(&mut self, c: u32, t: u32) {
         println!("cx({}, {})", c, t);
     }
@@ -50,7 +56,7 @@ impl<T: Layer> Layer for TransparentLayer<T> {
     }
 }
 
-impl<T: PauliGate> PauliGate for TransparentLayer<T> {
+impl<T: CliffordGate> CliffordGate for TransparentLayer<T> {
     fn x(&mut self, q: u32) {
         self.base.x(q)
     }
@@ -59,6 +65,18 @@ impl<T: PauliGate> PauliGate for TransparentLayer<T> {
     }
     fn z(&mut self, q: u32) {
         self.base.z(q)
+    }
+    fn h(&mut self, q: u32) {
+        self.base.h(q)
+    }
+    fn s(&mut self, q: u32) {
+        self.base.s(q)
+    }
+    fn sdg(&mut self, q: u32) {
+        self.base.sdg(q)
+    }
+    fn cx(&mut self, c: u32, t: u32) {
+        self.base.cx(c, t)
     }
 }
 
