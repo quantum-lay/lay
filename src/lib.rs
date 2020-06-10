@@ -2,7 +2,7 @@ pub type Qubit = u32;
 
 pub mod gates;
 // 何をもらってくるのがいいか?
-pub trait Laysur {
+pub trait Layer {
     type Receive; // 何らかのトレイトにしたい
     fn initialize(&mut self);
     fn receive(&mut self) -> Self::Receive; // 名前これでいいのか?

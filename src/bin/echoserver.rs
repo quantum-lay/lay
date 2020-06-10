@@ -1,10 +1,10 @@
-use laysur::Laysur;
-use laysur::gates::{XGate, YGate, ZGate, CXGate};
+use lay::Layer;
+use lay::gates::{XGate, YGate, ZGate, CXGate};
 
 struct EchoDriver {
 }
 
-impl Laysur for EchoDriver {
+impl Layer for EchoDriver {
     type Receive = ();
     fn initialize(&mut self) {
         println!("initialize()");
@@ -47,7 +47,7 @@ impl<T> TransparentLayer<T> {
     }
 }
 
-impl<T: Laysur> Laysur for TransparentLayer<T> {
+impl<T: Layer> Layer for TransparentLayer<T> {
     type Receive = ();
     fn initialize(&mut self) {
         self.base.initialize();

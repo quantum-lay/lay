@@ -1,5 +1,5 @@
 [package]
-name = "laysur"
+name = "lay"
 version = "0.1.0"
 authors = ["gyu-don <takumi.kt+git@gmail.com>"]
 edition = "2018"
