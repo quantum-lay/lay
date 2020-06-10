@@ -1,5 +1,5 @@
 use lay::Layer;
-use lay::gates::{XGate, YGate, ZGate, CXGate};
+use lay::gates::{PauliGate, CXGate};
 
 struct EchoDriver {
 }
@@ -13,19 +13,13 @@ impl Layer for EchoDriver {
     }
 }
 
-impl XGate for EchoDriver {
+impl PauliGate for EchoDriver {
     fn x(&mut self, q: u32) {
         println!("x({})", q);
     }
-}
-
-impl YGate for EchoDriver {
     fn y(&mut self, q: u32) {
         println!("y({})", q);
     }
-}
-
-impl ZGate for EchoDriver {
     fn z(&mut self, q: u32) {
         println!("z({})", q);
     }
@@ -56,19 +50,13 @@ impl<T: Layer> Layer for TransparentLayer<T> {
     }
 }
 
-impl<T: XGate> XGate for TransparentLayer<T> {
+impl<T: PauliGate> PauliGate for TransparentLayer<T> {
     fn x(&mut self, q: u32) {
         self.base.x(q)
     }
-}
-
-impl<T: YGate> YGate for TransparentLayer<T> {
     fn y(&mut self, q: u32) {
         self.base.y(q)
     }
-}
-
-impl<T: ZGate> ZGate for TransparentLayer<T> {
     fn z(&mut self, q: u32) {
         self.base.z(q)
     }
