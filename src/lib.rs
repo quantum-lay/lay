@@ -1,16 +1,15 @@
-pub type Qubit = u32;
-
 pub mod gates;
 
 // 何をもらってくるのがいいか?
 pub trait Layer {
+    type Qubit;
+    type Slot;
     type Receive; // 何らかのトレイトにしたい
     fn initialize(&mut self);
+    fn send(&mut self) {}
+    // 速度考えるなら、receiveのバッファは引数渡しした方がよくないか?
     fn receive(&mut self) -> Self::Receive; // 名前これでいいのか?
-    // measure関連:
-    // - 測るだけ測って結果見ないやつ←下と混ぜられそう
-    // - 測るけど結果は後で取るやつ
-    // - 測って結果を待つやつ←いる?
+    fn measure(&mut self, q: Self::Qubit, ch: Self::Slot);
 }
 
 #[cfg(test)]

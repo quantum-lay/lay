@@ -6,10 +6,16 @@ struct EchoDriver {
 
 impl Layer for EchoDriver {
     type Receive = ();
+    type Qubit = u32;
+    type Slot = u32;
     fn initialize(&mut self) {
         println!("initialize()");
     }
     fn receive(&mut self) -> () {
+        ()
+    }
+    fn measure(&mut self, q: u32, slot: u32) {
+        println!("m({}) -> slot({})", q, slot);
     }
 }
 
@@ -48,34 +54,43 @@ impl<T> TransparentLayer<T> {
 }
 
 impl<T: Layer> Layer for TransparentLayer<T> {
-    type Receive = ();
+    type Receive = T::Receive;
+    type Qubit = T::Qubit;
+    type Slot = T::Slot;
     fn initialize(&mut self) {
         self.base.initialize();
     }
-    fn receive(&mut self) -> () {
+    fn send(&mut self) {
+        self.base.send();
+    }
+    fn receive(&mut self) -> Self::Receive {
+        self.base.receive()
+    }
+    fn measure(&mut self, q: Self::Qubit, slot: Self::Slot) {
+        self.base.measure(q, slot)
     }
 }
 
 impl<T: CliffordGate> CliffordGate for TransparentLayer<T> {
-    fn x(&mut self, q: u32) {
+    fn x(&mut self, q: Self::Qubit) {
         self.base.x(q)
     }
-    fn y(&mut self, q: u32) {
+    fn y(&mut self, q: Self::Qubit) {
         self.base.y(q)
     }
-    fn z(&mut self, q: u32) {
+    fn z(&mut self, q: Self::Qubit) {
         self.base.z(q)
     }
-    fn h(&mut self, q: u32) {
+    fn h(&mut self, q: Self::Qubit) {
         self.base.h(q)
     }
-    fn s(&mut self, q: u32) {
+    fn s(&mut self, q: Self::Qubit) {
         self.base.s(q)
     }
-    fn sdg(&mut self, q: u32) {
+    fn sdg(&mut self, q: Self::Qubit) {
         self.base.sdg(q)
     }
-    fn cx(&mut self, c: u32, t: u32) {
+    fn cx(&mut self, c: Self::Qubit, t: Self::Qubit) {
         self.base.cx(c, t)
     }
 }
@@ -85,4 +100,7 @@ fn main() {
     cli.initialize();
     cli.x(0);
     cli.y(0);
+    cli.measure(0, 0);
+    cli.send();
+    cli.receive();
 }

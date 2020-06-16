@@ -1,16 +1,16 @@
-use crate::Qubit;
+use crate::Layer;
 
-pub trait CliffordGate {
-    fn x(&mut self, q: Qubit);
-    fn y(&mut self, q: Qubit);
-    fn z(&mut self, q: Qubit);
-    fn h(&mut self, q: Qubit);
-    fn s(&mut self, q: Qubit);
-    fn sdg(&mut self, q: Qubit);
-    fn cx(&mut self, c: Qubit, t: Qubit);
+pub trait CliffordGate : Layer {
+    fn x(&mut self, q: Self::Qubit);
+    fn y(&mut self, q: Self::Qubit);
+    fn z(&mut self, q: Self::Qubit);
+    fn h(&mut self, q: Self::Qubit);
+    fn s(&mut self, q: Self::Qubit);
+    fn sdg(&mut self, q: Self::Qubit);
+    fn cx(&mut self, c: Self::Qubit, t: Self::Qubit);
 }
 
-pub trait TGate {
-    fn t(&mut self, q: Qubit);
-    fn tdg(&mut self, q: Qubit);
+pub trait TGate : Layer {
+    fn t(&mut self, q: Self::Qubit);
+    fn tdg(&mut self, q: Self::Qubit);
 }
