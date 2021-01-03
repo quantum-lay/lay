@@ -18,7 +18,9 @@ pub mod opid {
     pub const USERDEF: u16 = 256;
 }
 
-pub trait OpArgs: Debug {}
+pub trait OpArgs: Debug + Send + Sync {}
+
+impl<T: Debug + Send + Sync> OpArgs for T {}
 
 #[derive(Debug)]
 pub enum Operation<L: Layer + ?Sized> {
@@ -116,6 +118,10 @@ impl<L: Layer> OpsVec<L> {
 
     pub fn iter(&self) -> impl Iterator<Item=&Operation<L>> {
         self.inner.iter()
+    }
+
+    pub fn clear(&mut self) {
+        self.inner.clear()
     }
 
     pub fn initialize(&mut self) {
