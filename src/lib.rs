@@ -13,9 +13,6 @@ pub trait Layer {
     type Response;
     type ReqRes;
 
-    fn initialize(&mut self);
-    fn measure(&mut self, q: Self::Qubit, ch: Self::Slot);
-
     fn send(&mut self, ops: &[Operation<Self>]) -> Self::Requested;
     fn receive(&mut self, buf: &mut Self::Buffer) -> Self::Response;
     fn send_receive(&mut self, ops: &[Operation<Self>], buf: &mut Self::Buffer) -> Self::ReqRes;
