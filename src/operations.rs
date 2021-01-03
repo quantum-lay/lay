@@ -3,7 +3,7 @@ use std::convert::{AsRef, AsMut};
 use crate::gates::*;
 use crate::Layer;
 
-pub mod gateid {
+pub mod opid {
     pub const INIT: u16 = 1;
     pub const MEAS: u16 = 2;
     pub const X: u16 = 3;
@@ -33,47 +33,47 @@ pub enum Operation<L: Layer + ?Sized> {
 }
 
 fn initialize<L: Layer>() -> Operation<L> {
-    Operation::Empty(gateid::INIT)
+    Operation::Empty(opid::INIT)
 }
 
 fn measure<L: Layer>(q: L::Qubit, s: L::Slot) -> Operation<L> {
-    Operation::QS(gateid::MEAS, q, s)
+    Operation::QS(opid::MEAS, q, s)
 }
 
 fn x<L: PauliGate>(q: L::Qubit) -> Operation<L> {
-    Operation::Q(gateid::X, q)
+    Operation::Q(opid::X, q)
 }
 
 fn y<L: PauliGate>(q: L::Qubit) -> Operation<L> {
-    Operation::Q(gateid::Y, q)
+    Operation::Q(opid::Y, q)
 }
 
 fn z<L: PauliGate>(q: L::Qubit) -> Operation<L> {
-    Operation::Q(gateid::Z, q)
+    Operation::Q(opid::Z, q)
 }
 
 fn h<L: HGate>(q: L::Qubit) -> Operation<L> {
-    Operation::Q(gateid::H, q)
+    Operation::Q(opid::H, q)
 }
 
 fn s<L: SGate>(q: L::Qubit) -> Operation<L> {
-    Operation::Q(gateid::S, q)
+    Operation::Q(opid::S, q)
 }
 
 fn sdg<L: SGate>(q: L::Qubit) -> Operation<L> {
-    Operation::Q(gateid::SDG, q)
+    Operation::Q(opid::SDG, q)
 }
 
 fn t<L: TGate>(q: L::Qubit) -> Operation<L> {
-    Operation::Q(gateid::T, q)
+    Operation::Q(opid::T, q)
 }
 
 fn tdg<L: TGate>(q: L::Qubit) -> Operation<L> {
-    Operation::Q(gateid::TDG, q)
+    Operation::Q(opid::TDG, q)
 }
 
 fn cx<L: CXGate>(c: L::Qubit, t: L::Qubit) -> Operation<L> {
-    Operation::QQ(gateid::CX, c, t)
+    Operation::QQ(opid::CX, c, t)
 }
 
 #[derive(Debug)]

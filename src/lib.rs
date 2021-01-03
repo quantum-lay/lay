@@ -11,11 +11,10 @@ pub trait Layer {
     type Buffer;
     type Requested;
     type Response;
-    type ReqRes;
 
     fn send(&mut self, ops: &[Operation<Self>]) -> Self::Requested;
     fn receive(&mut self, buf: &mut Self::Buffer) -> Self::Response;
-    fn send_receive(&mut self, ops: &[Operation<Self>], buf: &mut Self::Buffer) -> Self::ReqRes;
+    fn send_receive(&mut self, ops: &[Operation<Self>], buf: &mut Self::Buffer) -> Self::Response;
 }
 
 #[cfg(test)]
