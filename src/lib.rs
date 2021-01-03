@@ -1,9 +1,13 @@
+use std::fmt::Debug;
 pub mod gates;
 pub mod operations;
 
+pub use gates::{PauliGate, HGate, SGate, TGate, CXGate};
+pub use operations::{Operation, OpsVec};
+
 pub trait Layer {
-    type Qubit;
-    type Slot;
+    type Qubit: Debug;
+    type Slot: Debug;
     type Buffer;
     type Requested;
     type Response;
@@ -12,9 +16,9 @@ pub trait Layer {
     fn initialize(&mut self);
     fn measure(&mut self, q: Self::Qubit, ch: Self::Slot);
 
-    fn send(&mut self) -> Self::Requested;
+    fn send(&mut self, ops: &[Operation<Self>]) -> Self::Requested;
     fn receive(&mut self, buf: &mut Self::Buffer) -> Self::Response;
-    fn send_receive(&mut self, buf: &mut Self::Buffer) -> Self::ReqRes;
+    fn send_receive(&mut self, ops: &[Operation<Self>], buf: &mut Self::Buffer) -> Self::ReqRes;
 }
 
 #[cfg(test)]
