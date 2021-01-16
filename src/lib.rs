@@ -5,9 +5,9 @@ pub mod operations;
 pub trait Layer<Operation = operations::Operation<Self>> {
     type Qubit: Debug;
     type Slot: Debug;
-    type Buffer;
+    type Buffer: Measured<Slot=Self::Slot>;
     type Requested;
-    type Response: Measured<Slot=Self::Slot>;
+    type Response;
 
     fn send(&mut self, ops: &[Operation]) -> Self::Requested;
     fn receive(&mut self, buf: &mut Self::Buffer) -> Self::Response;
@@ -61,38 +61,6 @@ pub trait Measured {
         } else {
             self.get_range_u32(start, start + 32) as u64 | ((self.get_range_u32(start + 32, stop) as u64) << 32)
         }
-    }
-}
-
-impl<T: Measured, E> Measured for Result<T, E> {
-    type Slot = <T as Measured>::Slot;
-
-    fn get(&self, n: Self::Slot) -> bool {
-        self.as_ref().map(|ok| ok.get(n)).unwrap_or(false)
-    }
-
-    fn get_range_u8(&self, start: usize, stop: usize) -> u8
-        where Self::Slot : From<usize>
-    {
-        self.as_ref().map(|ok| ok.get_range_u8(start, stop)).unwrap_or(0)
-    }
-
-    fn get_range_u16(&self, start: usize, stop: usize) -> u16
-        where Self::Slot : From<usize>
-    {
-        self.as_ref().map(|ok| ok.get_range_u16(start, stop)).unwrap_or(0)
-    }
-
-    fn get_range_u32(&self, start: usize, stop: usize) -> u32
-        where Self::Slot : From<usize>
-    {
-        self.as_ref().map(|ok| ok.get_range_u32(start, stop)).unwrap_or(0)
-    }
-
-    fn get_range_u64(&self, start: usize, stop: usize) -> u64
-        where Self::Slot : From<usize>
-    {
-        self.as_ref().map(|ok| ok.get_range_u64(start, stop)).unwrap_or(0)
     }
 }
 
