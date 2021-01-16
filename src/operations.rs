@@ -1,3 +1,4 @@
+use std::any::Any;
 use std::fmt::Debug;
 use std::convert::{AsRef, AsMut};
 use crate::gates::*;
@@ -18,9 +19,6 @@ pub mod opid {
     pub const USERDEF: u16 = 256;
 }
 
-pub trait OpArgs: Debug + Send + Sync {}
-
-impl<T: Debug + Send + Sync> OpArgs for T {}
 
 #[derive(Debug)]
 pub enum Operation<L: Layer + ?Sized> {
@@ -31,7 +29,7 @@ pub enum Operation<L: Layer + ?Sized> {
     QF(u16, L::Qubit, f32),
     QD(u16, L::Qubit, f64),
     QFF(u16, L::Qubit, f32, f32),
-    Var(u16, Box<dyn OpArgs>),
+    Var(u16, Box<dyn Any>),
 }
 
 fn initialize<L: Layer>() -> Operation<L> {
