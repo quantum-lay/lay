@@ -2,6 +2,8 @@ use std::fmt::Debug;
 pub mod gates;
 pub mod operations;
 
+use num_traits::cast::{NumCast, cast};
+
 pub trait Layer<Operation = operations::Operation<Self>> {
     type Qubit: Debug;
     type Slot: Debug;
@@ -21,18 +23,18 @@ pub trait Measured {
     fn get(&self, n: Self::Slot) -> bool;
 
     fn get_range_u8(&self, start: usize, stop: usize) -> u8
-        where Self::Slot : From<usize>
+        where Self::Slot : NumCast
     {
         assert!(start <= stop && stop - start <= 8, "Invalid range.");
         let mut result = 0;
         for i in start..stop {
-            result |= (self.get(i.into()) as u8) << (i - start);
+            result |= (self.get(cast(i).unwrap()) as u8) << (i - start);
         }
         result
     }
 
     fn get_range_u16(&self, start: usize, stop: usize) -> u16
-        where Self::Slot : From<usize>
+        where Self::Slot : NumCast
     {
         assert!(start <= stop && stop - start <= 16, "Invalid range.");
         if stop - start <= 8 {
@@ -43,7 +45,7 @@ pub trait Measured {
     }
 
     fn get_range_u32(&self, start: usize, stop: usize) -> u32
-        where Self::Slot : From<usize>
+        where Self::Slot : NumCast
     {
         assert!(start <= stop && stop - start <= 32, "Invalid range.");
         if stop - start <= 16 {
@@ -54,7 +56,7 @@ pub trait Measured {
     }
 
     fn get_range_u64(&self, start: usize, stop: usize) -> u64
-        where Self::Slot : From<usize>
+        where Self::Slot : NumCast
     {
         assert!(start <= stop && stop - start <= 64, "Invalid range.");
         if stop - start <= 32 {
@@ -65,7 +67,7 @@ pub trait Measured {
     }
 }
 
-// pub trait Measured<Slot: From<usize>>{}
+// pub trait Measured<Slot: NumCast>{}
 pub use gates::{PauliGate, HGate, SGate, TGate, CXGate};
 pub use operations::{Operation, OpsVec};
 
