@@ -68,9 +68,8 @@ pub trait Measured {
     }
 }
 
-// pub trait Measured<Slot: NumCast>{}
 pub use gates::{PauliGate, HGate, SGate, TGate, CXGate};
-pub use operations::{Operation, OpsVec};
+pub use operations::OpsVec;
 
 #[cfg(test)]
 mod tests {
