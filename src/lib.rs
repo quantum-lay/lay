@@ -4,16 +4,17 @@ pub mod operations;
 
 use num_traits::cast::{NumCast, cast};
 
-pub trait Layer<Operation = operations::Operation<Self>> {
+pub trait Layer {
+    type Operation;
     type Qubit: Debug;
     type Slot: Debug;
     type Buffer: Measured<Slot=Self::Slot>;
     type Requested;
     type Response;
 
-    fn send(&mut self, ops: &[Operation]) -> Self::Requested;
+    fn send(&mut self, ops: &[Self::Operation]) -> Self::Requested;
     fn receive(&mut self, buf: &mut Self::Buffer) -> Self::Response;
-    fn send_receive(&mut self, ops: &[Operation], buf: &mut Self::Buffer) -> Self::Response;
+    fn send_receive(&mut self, ops: &[Self::Operation], buf: &mut Self::Buffer) -> Self::Response;
     fn make_buffer(&self) -> Self::Buffer;
 }
 

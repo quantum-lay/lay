@@ -1,6 +1,6 @@
 use std::any::Any;
-use std::fmt::Debug;
 use std::convert::{AsRef, AsMut};
+use std::fmt::Debug;
 use crate::gates::*;
 use crate::Layer;
 
@@ -19,9 +19,22 @@ pub mod opid {
     pub const USERDEF: u16 = 256;
 }
 
+pub trait Operation<L> where L: Layer + ?Sized {
+    fn initialize() -> L::Operation;
+    fn measure(q: L::Qubit, s: L::Slot) -> L::Operation;
+    fn x(q: L::Qubit) -> L::Operation where L: PauliGate;
+    fn y(q: L::Qubit) -> L::Operation where L: PauliGate;
+    fn z(q: L::Qubit) -> L::Operation where L: PauliGate;
+    fn h(q: L::Qubit) -> L::Operation where L: HGate;
+    fn s(q: L::Qubit) -> L::Operation where L: SGate;
+    fn sdg(q: L::Qubit) -> L::Operation where L: SGate;
+    fn t(q: L::Qubit) -> L::Operation where L: TGate;
+    fn tdg(q: L::Qubit) -> L::Operation where L: TGate;
+    fn cx(c: L::Qubit, t: L::Qubit) -> L::Operation where L: CXGate;
+}
 
 #[derive(Debug)]
-pub enum Operation<L: Layer + ?Sized> {
+pub enum OpArgs<L: Layer + ?Sized> {
     Empty(u16),
     Q(u16, L::Qubit),
     QQ(u16, L::Qubit, L::Qubit),
@@ -32,81 +45,83 @@ pub enum Operation<L: Layer + ?Sized> {
     Var(u16, Box<dyn Any>),
 }
 
-fn initialize<L: Layer>() -> Operation<L> {
-    Operation::Empty(opid::INIT)
-}
+impl<L> Operation<L> for OpArgs<L> where L: Layer<Operation=OpArgs<L>> + ?Sized {
+    fn initialize() -> OpArgs<L> {
+        OpArgs::Empty(opid::INIT)
+    }
 
-fn measure<L: Layer>(q: L::Qubit, s: L::Slot) -> Operation<L> {
-    Operation::QS(opid::MEAS, q, s)
-}
+    fn measure(q: L::Qubit, s: L::Slot) -> OpArgs<L> {
+        OpArgs::QS(opid::MEAS, q, s)
+    }
 
-fn x<L: PauliGate>(q: L::Qubit) -> Operation<L> {
-    Operation::Q(opid::X, q)
-}
+    fn x(q: L::Qubit) -> OpArgs<L> where L: PauliGate {
+        OpArgs::Q(opid::X, q)
+    }
 
-fn y<L: PauliGate>(q: L::Qubit) -> Operation<L> {
-    Operation::Q(opid::Y, q)
-}
+    fn y(q: L::Qubit) -> OpArgs<L> where L: PauliGate {
+        OpArgs::Q(opid::Y, q)
+    }
 
-fn z<L: PauliGate>(q: L::Qubit) -> Operation<L> {
-    Operation::Q(opid::Z, q)
-}
+    fn z(q: L::Qubit) -> OpArgs<L> where L: PauliGate {
+        OpArgs::Q(opid::Z, q)
+    }
 
-fn h<L: HGate>(q: L::Qubit) -> Operation<L> {
-    Operation::Q(opid::H, q)
-}
+    fn h(q: L::Qubit) -> OpArgs<L> where L: HGate {
+        OpArgs::Q(opid::H, q)
+    }
 
-fn s<L: SGate>(q: L::Qubit) -> Operation<L> {
-    Operation::Q(opid::S, q)
-}
+    fn s(q: L::Qubit) -> OpArgs<L> where L: SGate {
+        OpArgs::Q(opid::S, q)
+    }
 
-fn sdg<L: SGate>(q: L::Qubit) -> Operation<L> {
-    Operation::Q(opid::SDG, q)
-}
+    fn sdg(q: L::Qubit) -> OpArgs<L> where L: SGate {
+        OpArgs::Q(opid::SDG, q)
+     }
 
-fn t<L: TGate>(q: L::Qubit) -> Operation<L> {
-    Operation::Q(opid::T, q)
-}
+    fn t(q: L::Qubit) -> OpArgs<L> where L: TGate {
+        OpArgs::Q(opid::T, q)
+     }
 
-fn tdg<L: TGate>(q: L::Qubit) -> Operation<L> {
-    Operation::Q(opid::TDG, q)
-}
+    fn tdg(q: L::Qubit) -> OpArgs<L> where L: TGate {
+        OpArgs::Q(opid::TDG, q)
+    }
 
-fn cx<L: CXGate>(c: L::Qubit, t: L::Qubit) -> Operation<L> {
-    Operation::QQ(opid::CX, c, t)
+    fn cx(c: L::Qubit, t: L::Qubit) -> OpArgs<L> where L: CXGate {
+        OpArgs::QQ(opid::CX, c, t)
+    }
 }
 
 #[derive(Debug)]
-pub struct OpsVec<L: Layer> {
-    inner: Vec<Operation<L>>
+pub struct OpsVec<L: Layer> where {
+    inner: Vec<L::Operation>,
 }
 
-impl<L: Layer> OpsVec<L> {
-    pub fn new() -> OpsVec<L> {
+impl<L> OpsVec<L> where L: Layer {
+    pub fn new() -> Self {
         OpsVec::from_vec(vec![])
     }
 
-    pub fn from_vec(v: Vec<Operation<L>>) -> OpsVec<L> {
+    pub fn from_vec(v: Vec<L::Operation>) -> Self {
         OpsVec { inner: v }
     }
 
-    pub fn into_vec(self) -> Vec<Operation<L>> {
+    pub fn into_vec(self) -> Vec<L::Operation> {
         self.inner
     }
 
-    pub fn as_slice(&self) -> &[Operation<L>] {
+    pub fn as_slice(&self) -> &[L::Operation] {
         &self.inner
     }
 
-    pub fn as_mut_slice(&mut self) -> &mut [Operation<L>] {
+    pub fn as_mut_slice(&mut self) -> &mut [L::Operation] {
         &mut self.inner
     }
 
-    pub fn as_vec(&self) -> &Vec<Operation<L>> {
+    pub fn as_vec(&self) -> &Vec<L::Operation> {
         &self.inner
     }
 
-    pub fn as_mut_vec(&mut self) -> &mut Vec<Operation<L>> {
+    pub fn as_mut_vec(&mut self) -> &mut Vec<L::Operation> {
         &mut self.inner
     }
 
@@ -114,76 +129,68 @@ impl<L: Layer> OpsVec<L> {
         self.inner.len()
     }
 
-    pub fn iter(&self) -> impl Iterator<Item=&Operation<L>> {
+    pub fn iter(&self) -> impl Iterator<Item=&L::Operation> {
         self.inner.iter()
     }
 
     pub fn clear(&mut self) {
         self.inner.clear()
     }
-
-    pub fn initialize(&mut self) {
-        self.inner.push(initialize());
-    }
-    pub fn measure(&mut self, q: L::Qubit, s: L::Slot) {
-        self.inner.push(measure(q, s));
-    }
 }
 
-impl<L: Layer> AsRef<[Operation<L>]> for OpsVec<L> {
-    fn as_ref(&self) -> &[Operation<L>] {
+impl<L: Layer> AsRef<[L::Operation]> for OpsVec<L> {
+    fn as_ref(&self) -> &[L::Operation] {
         self.as_slice()
     }
 }
 
-impl<L: Layer> AsMut<[Operation<L>]> for OpsVec<L> {
-    fn as_mut(&mut self) -> &mut [Operation<L>] {
+impl<L: Layer> AsMut<[L::Operation]> for OpsVec<L> {
+    fn as_mut(&mut self) -> &mut [L::Operation] {
         self.as_mut_slice()
     }
 }
 
-impl<L: PauliGate> OpsVec<L> {
-    pub fn x(&mut self, q: L::Qubit) {
-        self.inner.push(x(q));
+impl<L> OpsVec<L> where L: Layer, L::Operation: Operation<L> {
+    pub fn initialize(&mut self) {
+        self.inner.push(L::Operation::initialize());
+    }
+    pub fn measure(&mut self, q: L::Qubit, s: L::Slot) {
+        self.inner.push(L::Operation::measure(q, s));
     }
 
-    pub fn y(&mut self, q: L::Qubit) {
-        self.inner.push(y(q));
+    pub fn x(&mut self, q: <L as Layer>::Qubit) where L: PauliGate {
+        self.inner.push(L::Operation::x(q));
     }
 
-    pub fn z(&mut self, q: L::Qubit) {
-        self.inner.push(z(q));
-    }
-}
-
-impl<L: HGate> OpsVec<L> {
-    pub fn h(&mut self, q: L::Qubit) {
-        self.inner.push(h(q));
-    }
-}
-
-impl<L: SGate> OpsVec<L> {
-    pub fn s(&mut self, q: L::Qubit) {
-        self.inner.push(s(q));
+    pub fn y(&mut self, q: <L as Layer>::Qubit) where L: PauliGate {
+        self.inner.push(L::Operation::y(q));
     }
 
-    pub fn sdg(&mut self, q: L::Qubit) {
-        self.inner.push(sdg(q));
-    }
-}
-
-impl<L: TGate> OpsVec<L> {
-    pub fn t(&mut self, q: L::Qubit) {
-        self.inner.push(t(q));
+    pub fn z(&mut self, q: <L as Layer>::Qubit) where L: PauliGate {
+        self.inner.push(L::Operation::z(q));
     }
 
-    pub fn tdg(&mut self, q: L::Qubit) {
-        self.inner.push(tdg(q));
+    pub fn h(&mut self, q: <L as Layer>::Qubit) where L: HGate {
+        self.inner.push(L::Operation::h(q));
     }
-}
 
-impl<L: CXGate> OpsVec<L> {
-    pub fn cx(&mut self, c: L::Qubit, t: L::Qubit) {
-        self.inner.push(cx(c, t));
+    pub fn s(&mut self, q: <L as Layer>::Qubit) where L: SGate {
+        self.inner.push(L::Operation::s(q));
+    }
+
+    pub fn sdg(&mut self, q: <L as Layer>::Qubit) where L: SGate {
+        self.inner.push(L::Operation::sdg(q));
+    }
+
+    pub fn t(&mut self, q: <L as Layer>::Qubit) where L: TGate {
+        self.inner.push(L::Operation::t(q));
+    }
+
+    pub fn tdg(&mut self, q: <L as Layer>::Qubit) where L: TGate {
+        self.inner.push(L::Operation::tdg(q));
+    }
+
+    pub fn cx(&mut self, c: <L as Layer>::Qubit, t: <L as Layer>::Qubit) where L: CXGate {
+        self.inner.push(L::Operation::cx(c, t));
     }
 }
