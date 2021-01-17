@@ -20,17 +20,17 @@ pub mod opid {
 }
 
 pub trait Operation<L> where L: Layer + ?Sized {
-    fn initialize() -> L::Operation;
-    fn measure(q: L::Qubit, s: L::Slot) -> L::Operation;
-    fn x(q: L::Qubit) -> L::Operation where L: PauliGate;
-    fn y(q: L::Qubit) -> L::Operation where L: PauliGate;
-    fn z(q: L::Qubit) -> L::Operation where L: PauliGate;
-    fn h(q: L::Qubit) -> L::Operation where L: HGate;
-    fn s(q: L::Qubit) -> L::Operation where L: SGate;
-    fn sdg(q: L::Qubit) -> L::Operation where L: SGate;
-    fn t(q: L::Qubit) -> L::Operation where L: TGate;
-    fn tdg(q: L::Qubit) -> L::Operation where L: TGate;
-    fn cx(c: L::Qubit, t: L::Qubit) -> L::Operation where L: CXGate;
+    fn initialize() -> Self;
+    fn measure(q: L::Qubit, s: L::Slot) -> Self;
+    fn x(q: L::Qubit) -> Self where L: PauliGate;
+    fn y(q: L::Qubit) -> Self where L: PauliGate;
+    fn z(q: L::Qubit) -> Self where L: PauliGate;
+    fn h(q: L::Qubit) -> Self where L: HGate;
+    fn s(q: L::Qubit) -> Self where L: SGate;
+    fn sdg(q: L::Qubit) -> Self where L: SGate;
+    fn t(q: L::Qubit) -> Self where L: TGate;
+    fn tdg(q: L::Qubit) -> Self where L: TGate;
+    fn cx(c: L::Qubit, t: L::Qubit) -> Self where L: CXGate;
 }
 
 #[derive(Debug)]
