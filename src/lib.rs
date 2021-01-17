@@ -1,4 +1,3 @@
-use std::fmt::Debug;
 pub mod gates;
 pub mod operations;
 pub mod convert;
@@ -7,8 +6,8 @@ use num_traits::cast::{NumCast, cast};
 
 pub trait Layer {
     type Operation: operations::Operation<Self>;
-    type Qubit: Debug;
-    type Slot: Debug;
+    type Qubit;
+    type Slot;
     type Buffer: Measured<Slot=Self::Slot>;
     type Requested;
     type Response;

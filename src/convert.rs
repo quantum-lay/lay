@@ -1,4 +1,3 @@
-use std::fmt::Debug;
 use std::marker::PhantomData;
 use crate::{Layer, Measured, operations::Operation, gates::{PauliGate, HGate, SGate, TGate, CXGate}};
 
@@ -7,14 +6,14 @@ pub trait Converter<Q1, Q2, S1, S2> {
     fn sconv(s: S1) -> S2;
 }
 
-pub struct QubitSlotConvertLayer<L: Layer, Q: Debug, S: Debug, C>
+pub struct QubitSlotConvertLayer<L: Layer, Q, S, C>
     where C: Converter<Q, L::Qubit, S, L::Slot>
 {
     layer: L,
     phantom: PhantomData<(C, Q, S)>,
 }
 
-impl<L: Layer, Q: Debug, S: Debug, C> Layer for QubitSlotConvertLayer<L, Q, S, C>
+impl<L: Layer, Q, S, C> Layer for QubitSlotConvertLayer<L, Q, S, C>
     where C: Converter<Q, L::Qubit, S, L::Slot>
 {
     type Operation = ConvOp<L, Q, S, C>;
@@ -46,16 +45,17 @@ impl<L: Layer, Q: Debug, S: Debug, C> Layer for QubitSlotConvertLayer<L, Q, S, C
     }
 }
 
-impl<L: Layer + PauliGate, Q: Debug, S: Debug, C> PauliGate for QubitSlotConvertLayer<L, Q, S, C>
+impl<L: Layer + PauliGate, Q, S, C> PauliGate for QubitSlotConvertLayer<L, Q, S, C>
     where C: Converter<Q, L::Qubit, S, L::Slot> {}
-impl<L: Layer + HGate, Q: Debug, S: Debug, C> HGate for QubitSlotConvertLayer<L, Q, S, C>
+impl<L: Layer + PauliGate + HGate, Q, S, C> HGate for QubitSlotConvertLayer<L, Q, S, C>
     where C: Converter<Q, L::Qubit, S, L::Slot> {}
 
 
 #[repr(transparent)]
-struct ConvOp<L: Layer, Q: Debug, S: Debug, C> (L::Operation, PhantomData<(L, Q, S, C)>);
-impl<L: Layer, Q: Debug, S: Debug, C> Operation<QubitSlotConvertLayer<L, Q, S, C>> for ConvOp<L, Q, S, C>
+struct ConvOp<L: Layer, Q, S, C> (L::Operation, PhantomData<(L, Q, S, C)>);
+impl<L: Layer, Q, S, C> Operation<QubitSlotConvertLayer<L, Q, S, C>> for ConvOp<L, Q, S, C>
         where C: Converter<Q, L::Qubit, S, L::Slot>,
+              QubitSlotConvertLayer<L, Q, S, C>: Layer,
 {
     fn initialize() -> Self {
         ConvOp(L::Operation::initialize(), PhantomData)
@@ -65,7 +65,10 @@ impl<L: Layer, Q: Debug, S: Debug, C> Operation<QubitSlotConvertLayer<L, Q, S, C
         ConvOp(L::Operation::measure(C::qconv(q), C::sconv(s)), PhantomData)
     }
 
-    fn x(q: <QubitSlotConvertLayer<L, Q, S, C> as Layer>::Qubit) -> Self where QubitSlotConvertLayer<L, Q, S, C>: PauliGate {
+    fn x(q: <QubitSlotConvertLayer<L, Q, S, C> as Layer>::Qubit) -> Self
+            where QubitSlotConvertLayer<L, Q, S, C>: PauliGate,
+                  L: Layer, C: Converter<Q, L::Qubit, S, L::Slot>,
+    {
         ConvOp(L::Operation::x(C::qconv(q)), PhantomData)
     }
 
