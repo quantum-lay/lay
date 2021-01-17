@@ -1,6 +1,6 @@
 pub mod gates;
 pub mod operations;
-pub mod convert;
+//pub mod convert;
 
 use num_traits::cast::{NumCast, cast};
 
