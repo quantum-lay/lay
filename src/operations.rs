@@ -22,15 +22,30 @@ pub mod opid {
 pub trait Operation<L> where L: Layer + ?Sized {
     fn initialize() -> Self;
     fn measure(q: L::Qubit, s: L::Slot) -> Self;
-    fn x(q: L::Qubit) -> Self where L: PauliGate;
-    fn y(q: L::Qubit) -> Self where L: PauliGate;
-    fn z(q: L::Qubit) -> Self where L: PauliGate;
-    fn h(q: L::Qubit) -> Self where L: HGate;
-    fn s(q: L::Qubit) -> Self where L: SGate;
-    fn sdg(q: L::Qubit) -> Self where L: SGate;
-    fn t(q: L::Qubit) -> Self where L: TGate;
-    fn tdg(q: L::Qubit) -> Self where L: TGate;
-    fn cx(c: L::Qubit, t: L::Qubit) -> Self where L: CXGate;
+}
+
+pub trait PauliOperation<L> where L: Layer + PauliGate + ?Sized {
+    fn x(q: L::Qubit) -> Self;
+    fn y(q: L::Qubit) -> Self;
+    fn z(q: L::Qubit) -> Self;
+}
+
+pub trait HOperation<L> where L: Layer + HGate + ?Sized {
+    fn h(q: L::Qubit) -> Self;
+}
+
+pub trait SOperation<L> where L: Layer + SGate + ?Sized {
+    fn s(q: L::Qubit) -> Self;
+    fn sdg(q: L::Qubit) -> Self;
+}
+
+pub trait TOperation<L> where L: Layer + TGate + ?Sized {
+    fn t(q: L::Qubit) -> Self;
+    fn tdg(q: L::Qubit) -> Self;
+}
+
+pub trait CXOperation<L> where L: Layer + CXGate + ?Sized {
+    fn cx(c: L::Qubit, t: L::Qubit) -> Self;
 }
 
 #[derive(Debug)]
@@ -53,40 +68,50 @@ impl<L> Operation<L> for OpArgs<L> where L: Layer<Operation=OpArgs<L>> + ?Sized 
     fn measure(q: L::Qubit, s: L::Slot) -> OpArgs<L> {
         OpArgs::QS(opid::MEAS, q, s)
     }
+}
 
-    fn x(q: L::Qubit) -> OpArgs<L> where L: PauliGate {
+impl<L> PauliOperation<L> for OpArgs<L> where L: Layer<Operation=OpArgs<L>> + PauliGate + ?Sized {
+    fn x(q: L::Qubit) -> OpArgs<L> {
         OpArgs::Q(opid::X, q)
     }
 
-    fn y(q: L::Qubit) -> OpArgs<L> where L: PauliGate {
+    fn y(q: L::Qubit) -> OpArgs<L> {
         OpArgs::Q(opid::Y, q)
     }
 
-    fn z(q: L::Qubit) -> OpArgs<L> where L: PauliGate {
+    fn z(q: L::Qubit) -> OpArgs<L> {
         OpArgs::Q(opid::Z, q)
     }
+}
 
-    fn h(q: L::Qubit) -> OpArgs<L> where L: HGate {
+impl<L> HOperation<L> for OpArgs<L> where L: Layer<Operation=OpArgs<L>> + HGate + ?Sized {
+    fn h(q: L::Qubit) -> OpArgs<L> {
         OpArgs::Q(opid::H, q)
     }
+}
 
-    fn s(q: L::Qubit) -> OpArgs<L> where L: SGate {
+impl<L> SOperation<L> for OpArgs<L> where L: Layer<Operation=OpArgs<L>> + SGate + ?Sized {
+    fn s(q: L::Qubit) -> OpArgs<L> {
         OpArgs::Q(opid::S, q)
     }
 
-    fn sdg(q: L::Qubit) -> OpArgs<L> where L: SGate {
+    fn sdg(q: L::Qubit) -> OpArgs<L> {
         OpArgs::Q(opid::SDG, q)
      }
+}
 
-    fn t(q: L::Qubit) -> OpArgs<L> where L: TGate {
+impl<L> TOperation<L> for OpArgs<L> where L: Layer<Operation=OpArgs<L>> + TGate + ?Sized {
+    fn t(q: L::Qubit) -> OpArgs<L> {
         OpArgs::Q(opid::T, q)
      }
 
-    fn tdg(q: L::Qubit) -> OpArgs<L> where L: TGate {
+    fn tdg(q: L::Qubit) -> OpArgs<L> {
         OpArgs::Q(opid::TDG, q)
     }
+}
 
-    fn cx(c: L::Qubit, t: L::Qubit) -> OpArgs<L> where L: CXGate {
+impl<L> CXOperation<L> for OpArgs<L> where L: Layer<Operation=OpArgs<L>> + CXGate + ?Sized {
+    fn cx(c: L::Qubit, t: L::Qubit) -> OpArgs<L> {
         OpArgs::QQ(opid::CX, c, t)
     }
 }
@@ -157,23 +182,29 @@ impl<L> OpsVec<L> where L: Layer, L::Operation: Operation<L> {
     pub fn measure(&mut self, q: L::Qubit, s: L::Slot) {
         self.inner.push(L::Operation::measure(q, s));
     }
+}
 
-    pub fn x(&mut self, q: <L as Layer>::Qubit) where L: PauliGate {
+impl<L> OpsVec<L> where L: Layer + PauliGate, L::Operation: PauliOperation<L> {
+    pub fn x(&mut self, q: <L as Layer>::Qubit) {
         self.inner.push(L::Operation::x(q));
     }
 
-    pub fn y(&mut self, q: <L as Layer>::Qubit) where L: PauliGate {
+    pub fn y(&mut self, q: <L as Layer>::Qubit) {
         self.inner.push(L::Operation::y(q));
     }
 
-    pub fn z(&mut self, q: <L as Layer>::Qubit) where L: PauliGate {
+    pub fn z(&mut self, q: <L as Layer>::Qubit) {
         self.inner.push(L::Operation::z(q));
     }
+}
 
-    pub fn h(&mut self, q: <L as Layer>::Qubit) where L: HGate {
+impl<L> OpsVec<L> where L: Layer + HGate, L::Operation: HOperation<L> {
+    pub fn h(&mut self, q: <L as Layer>::Qubit) {
         self.inner.push(L::Operation::h(q));
     }
+}
 
+impl<L> OpsVec<L> where L: Layer + SGate, L::Operation: SOperation<L> {
     pub fn s(&mut self, q: <L as Layer>::Qubit) where L: SGate {
         self.inner.push(L::Operation::s(q));
     }
@@ -181,7 +212,9 @@ impl<L> OpsVec<L> where L: Layer, L::Operation: Operation<L> {
     pub fn sdg(&mut self, q: <L as Layer>::Qubit) where L: SGate {
         self.inner.push(L::Operation::sdg(q));
     }
+}
 
+impl<L> OpsVec<L> where L: Layer + TGate, L::Operation: TOperation<L> {
     pub fn t(&mut self, q: <L as Layer>::Qubit) where L: TGate {
         self.inner.push(L::Operation::t(q));
     }
@@ -189,7 +222,9 @@ impl<L> OpsVec<L> where L: Layer, L::Operation: Operation<L> {
     pub fn tdg(&mut self, q: <L as Layer>::Qubit) where L: TGate {
         self.inner.push(L::Operation::tdg(q));
     }
+}
 
+impl<L> OpsVec<L> where L: Layer + CXGate, L::Operation: CXOperation<L> {
     pub fn cx(&mut self, c: <L as Layer>::Qubit, t: <L as Layer>::Qubit) where L: CXGate {
         self.inner.push(L::Operation::cx(c, t));
     }

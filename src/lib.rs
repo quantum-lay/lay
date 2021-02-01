@@ -1,11 +1,11 @@
 pub mod gates;
 pub mod operations;
-//pub mod convert;
+pub mod convert;
 
 use num_traits::cast::{NumCast, cast};
 
 pub trait Layer {
-    type Operation: operations::Operation<Self>;
+    type Operation;
     type Qubit;
     type Slot;
     type Buffer: Measured<Slot=Self::Slot>;
