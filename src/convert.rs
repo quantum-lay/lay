@@ -13,6 +13,13 @@ pub struct QubitSlotConvertLayer<L: Layer, Q, S, C>
     phantom: PhantomData<(C, Q, S)>,
 }
 
+impl<L: Layer, Q, S, C> QubitSlotConvertLayer<L, Q, S, C>
+        where C: Converter<Q, L::Qubit, S, L::Slot> {
+    pub fn new(layer: L) -> Self {
+        QubitSlotConvertLayer { layer, phantom: PhantomData }
+    }
+}
+
 impl<L: Layer, Q, S, C> Layer for QubitSlotConvertLayer<L, Q, S, C>
     where C: Converter<Q, L::Qubit, S, L::Slot>
 {
