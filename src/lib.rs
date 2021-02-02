@@ -1,8 +1,12 @@
 pub mod gates;
 pub mod operations;
 pub mod convert;
+pub mod inspect;
 
 use num_traits::cast::{NumCast, cast};
+
+pub use gates::{PauliGate, HGate, SGate, TGate, CXGate};
+pub use operations::OpsVec;
 
 pub trait Layer {
     type Operation;
@@ -67,9 +71,6 @@ pub trait Measured {
         }
     }
 }
-
-pub use gates::{PauliGate, HGate, SGate, TGate, CXGate};
-pub use operations::OpsVec;
 
 #[cfg(test)]
 mod tests {
