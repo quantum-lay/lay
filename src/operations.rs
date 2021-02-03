@@ -117,11 +117,11 @@ impl<L> CXOperation<L> for OpArgs<L> where L: Layer<Operation=OpArgs<L>> + CXGat
 }
 
 #[derive(Debug)]
-pub struct OpsVec<L: Layer> {
+pub struct OpsVec<L: Layer + ?Sized> {
     inner: Vec<L::Operation>,
 }
 
-impl<L> OpsVec<L> where L: Layer {
+impl<L> OpsVec<L> where L: Layer + ?Sized {
     pub fn new() -> Self {
         OpsVec::from_vec(vec![])
     }
@@ -163,19 +163,19 @@ impl<L> OpsVec<L> where L: Layer {
     }
 }
 
-impl<L: Layer> AsRef<[L::Operation]> for OpsVec<L> {
+impl<L: Layer + ?Sized> AsRef<[L::Operation]> for OpsVec<L> {
     fn as_ref(&self) -> &[L::Operation] {
         self.as_slice()
     }
 }
 
-impl<L: Layer> AsMut<[L::Operation]> for OpsVec<L> {
+impl<L: Layer + ?Sized> AsMut<[L::Operation]> for OpsVec<L> {
     fn as_mut(&mut self) -> &mut [L::Operation] {
         self.as_mut_slice()
     }
 }
 
-impl<L> OpsVec<L> where L: Layer, L::Operation: Operation<L> {
+impl<L> OpsVec<L> where L: Layer + ?Sized, L::Operation: Operation<L> {
     pub fn initialize(&mut self) {
         self.inner.push(L::Operation::initialize());
     }
@@ -184,7 +184,7 @@ impl<L> OpsVec<L> where L: Layer, L::Operation: Operation<L> {
     }
 }
 
-impl<L> OpsVec<L> where L: Layer + PauliGate, L::Operation: PauliOperation<L> {
+impl<L> OpsVec<L> where L: Layer + PauliGate + ?Sized, L::Operation: PauliOperation<L> {
     pub fn x(&mut self, q: <L as Layer>::Qubit) {
         self.inner.push(L::Operation::x(q));
     }
@@ -198,13 +198,13 @@ impl<L> OpsVec<L> where L: Layer + PauliGate, L::Operation: PauliOperation<L> {
     }
 }
 
-impl<L> OpsVec<L> where L: Layer + HGate, L::Operation: HOperation<L> {
+impl<L> OpsVec<L> where L: Layer + HGate + ?Sized, L::Operation: HOperation<L> {
     pub fn h(&mut self, q: <L as Layer>::Qubit) {
         self.inner.push(L::Operation::h(q));
     }
 }
 
-impl<L> OpsVec<L> where L: Layer + SGate, L::Operation: SOperation<L> {
+impl<L> OpsVec<L> where L: Layer + SGate + ?Sized, L::Operation: SOperation<L> {
     pub fn s(&mut self, q: <L as Layer>::Qubit) where L: SGate {
         self.inner.push(L::Operation::s(q));
     }
@@ -214,7 +214,7 @@ impl<L> OpsVec<L> where L: Layer + SGate, L::Operation: SOperation<L> {
     }
 }
 
-impl<L> OpsVec<L> where L: Layer + TGate, L::Operation: TOperation<L> {
+impl<L> OpsVec<L> where L: Layer + TGate + ?Sized, L::Operation: TOperation<L> {
     pub fn t(&mut self, q: <L as Layer>::Qubit) where L: TGate {
         self.inner.push(L::Operation::t(q));
     }
@@ -224,7 +224,7 @@ impl<L> OpsVec<L> where L: Layer + TGate, L::Operation: TOperation<L> {
     }
 }
 
-impl<L> OpsVec<L> where L: Layer + CXGate, L::Operation: CXOperation<L> {
+impl<L> OpsVec<L> where L: Layer + CXGate + ?Sized, L::Operation: CXOperation<L> {
     pub fn cx(&mut self, c: <L as Layer>::Qubit, t: <L as Layer>::Qubit) where L: CXGate {
         self.inner.push(L::Operation::cx(c, t));
     }
