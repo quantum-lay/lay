@@ -1,7 +1,7 @@
 pub mod gates;
 pub mod operations;
 pub mod convert;
-pub mod inspect;
+pub mod inject;
 
 use num_traits::cast::{NumCast, cast};
 
