@@ -57,7 +57,7 @@ pub enum OpArgs<L: Layer + ?Sized> {
     QF(u16, L::Qubit, f32),
     QD(u16, L::Qubit, f64),
     QFF(u16, L::Qubit, f32, f32),
-    Var(u16, Box<dyn Any>),
+    Var(u16, Box<dyn Any + Send>),
 }
 
 impl<L> Operation<L> for OpArgs<L> where L: Layer<Operation=OpArgs<L>> + ?Sized {
