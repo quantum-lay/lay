@@ -4,6 +4,7 @@ use crate::Layer;
 use crate::gates::{PauliGate, HGate, SGate, TGate, CXGate};
 use crate::operations::{Operation, PauliOperation, HOperation, SOperation, TOperation, CXOperation};
 
+/// Vec wrapper for building slice of `Operation`s.
 #[derive(Debug)]
 pub struct OpsVec<L: Layer + ?Sized> {
     inner: Vec<L::Operation>,

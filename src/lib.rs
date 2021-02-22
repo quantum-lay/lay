@@ -1,3 +1,8 @@
+//! An interface for quantum computing.
+//!
+//! Lay provides interface for sending and receiving operations for
+//! quantum computer hardwares or simulators.
+
 pub mod gates;
 pub mod operations;
 pub mod convert;

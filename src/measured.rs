@@ -1,10 +1,13 @@
 use num_traits::cast::{NumCast, cast};
 
+/// Gets the measured result.
 pub trait Measured {
     type Slot;
 
+    /// Gets a single measured result.
     fn get(&self, n: Self::Slot) -> bool;
 
+    /// Gets sequential measured result as u8.
     fn get_range_u8(&self, start: usize, stop: usize) -> u8
         where Self::Slot : NumCast
     {
@@ -16,6 +19,7 @@ pub trait Measured {
         result
     }
 
+    /// Gets sequential measured result as u16.
     fn get_range_u16(&self, start: usize, stop: usize) -> u16
         where Self::Slot : NumCast
     {
@@ -27,6 +31,7 @@ pub trait Measured {
         }
     }
 
+    /// Gets sequential measured result as u32.
     fn get_range_u32(&self, start: usize, stop: usize) -> u32
         where Self::Slot : NumCast
     {
@@ -38,6 +43,7 @@ pub trait Measured {
         }
     }
 
+    /// Gets sequential measured result as u64.
     fn get_range_u64(&self, start: usize, stop: usize) -> u64
         where Self::Slot : NumCast
     {

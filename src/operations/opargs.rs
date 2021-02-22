@@ -5,21 +5,36 @@ use crate::Layer;
 use crate::gates::{PauliGate, HGate, SGate, TGate, CXGate};
 use crate::operations::{Operation, PauliOperation, HOperation, SOperation, TOperation, CXOperation};
 
+/// Builtin operation IDs.
 pub mod opid {
+    /// Initialize
     pub const INIT: u16 = 1;
+    /// Measurement
     pub const MEAS: u16 = 2;
+    /// Pauli X gate
     pub const X: u16 = 3;
+    /// Pauli Y gate
     pub const Y: u16 = 4;
+    /// Pauli Z gate
     pub const Z: u16 = 5;
+    /// Hadamard gate
     pub const H: u16 = 6;
+    /// S gate
     pub const S: u16 = 7;
+    /// S† gate
     pub const SDG: u16 = 8;
+    /// T gate
     pub const T: u16 = 9;
+    /// T† gate
     pub const TDG: u16 = 10;
+    /// CNOT gate
     pub const CX: u16 = 11;
+    /// When library user defines new operation ID,
+    /// the value should greater than or equal to this value.
     pub const USERDEF: u16 = 256;
 }
 
+/// An reference implementation of `Operation`.
 #[derive(Debug)]
 pub enum OpArgs<L: Layer + ?Sized> {
     Empty(u16),
