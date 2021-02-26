@@ -50,6 +50,10 @@ impl<L> OpsVec<L> where L: Layer + ?Sized {
     pub fn clear(&mut self) {
         self.inner.clear()
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.inner.is_empty()
+    }
 }
 
 impl<L: Layer + ?Sized> AsRef<[L::Operation]> for OpsVec<L> {
