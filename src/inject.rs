@@ -3,6 +3,7 @@ use crate::{Layer,
             gates::{PauliGate, HGate, SGate, TGate, CXGate},
             operations::{Operation, PauliOperation, HOperation, SOperation, TOperation, CXOperation}};
 
+#[derive(Debug)]
 pub struct InjectLayer<L: Layer,
                         F: Fn(&mut L, &[L::Operation]) -> L::Requested,
                         G: Fn(&mut L, &mut L::Buffer) -> L::Response,
@@ -75,6 +76,7 @@ impl<L: Layer + CXGate,
      H: Fn(&mut L, &[L::Operation], &mut L::Buffer) -> L::Response> CXGate for InjectLayer<L, F, G, H> {}
 
 #[repr(transparent)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InjectOperation<L: Layer,
                             F: Fn(&mut L, &[L::Operation]) -> L::Requested,
                             G: Fn(&mut L, &mut L::Buffer) -> L::Response,

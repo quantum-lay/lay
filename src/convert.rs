@@ -6,6 +6,7 @@ pub trait Converter<Q1, Q2, S1, S2> {
     fn sconv(s: S1) -> S2;
 }
 
+#[derive(Debug)]
 pub struct QubitSlotConvertLayer<L: Layer, Q, S, C>
     where C: Converter<Q, L::Qubit, S, L::Slot>
 {
@@ -64,6 +65,7 @@ impl<L: Layer + CXGate, Q, S, C> CXGate for QubitSlotConvertLayer<L, Q, S, C>
     where C: Converter<Q, L::Qubit, S, L::Slot> {}
 
 #[repr(transparent)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct QubitSlotConvertOperation<L: Layer, Q, S, C> (L::Operation, std::marker::PhantomData<(Q, S, C)>);
 
 impl<L: Layer, Q, S, C> QubitSlotConvertOperation<L, Q, S, C>
