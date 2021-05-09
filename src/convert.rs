@@ -167,3 +167,16 @@ impl<Conv: Layer, L: Layer, C> Measured for QubitSlotConvertLayerBuffer<Conv, L,
         self.0.get(C::sconv(n))
     }
 }
+
+pub struct SerializationLayerConverterU32<const W: u32>();
+impl<const W: u32> Converter<(u32, u32), u32, (u32, u32), u32> for SerializationLayerConverterU32<W> {
+    fn qconv(q: (u32, u32)) -> u32 { 
+        q.0 + q.1 * W
+    }
+
+    fn sconv(s: (u32, u32)) -> u32 { 
+        s.0 + s.1 * W
+    }
+}
+
+pub type SerializationLayer<L, const W: u32> = QubitSlotConvertLayer<L, (u32, u32), (u32, u32), SerializationLayerConverterU32<W>>;
